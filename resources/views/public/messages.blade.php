@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="panel">
-        <h3 class="panel-header">Message from the Chairman / Headmaster</h3>
+        <h3 class="panel-header">Message from the Headmaster</h3>
         <div class="panel-body">
             @if($headmaster)
                 <div style="display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:12px;">
