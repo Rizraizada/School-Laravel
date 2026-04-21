@@ -1,28 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="card">
-        <div class="section-header">
-            <h1>Board of Directors / Committee</h1>
+    <section class="panel">
+        <h3 class="panel-header">Board Committee & Directors</h3>
+        <div class="panel-body">
+            <div class="portal-table-wrap">
+                <table class="portal-table">
+                    <thead>
+                    <tr>
+                        <th style="width:8%;">SL</th>
+                        <th style="width:20%;">Committee</th>
+                        <th style="width:22%;">Name</th>
+                        <th style="width:20%;">Position</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($directors as $index => $director)
+                        <tr>
+                            <td>{{ $directors->firstItem() + $index }}</td>
+                            <td>
+                                @if($director->committee)
+                                    <span class="pill">{{ $director->committee }}</span>
+                                @else
+                                    <span class="text-muted">General</span>
+                                @endif
+                            </td>
+                            <td><strong>{{ $director->name }}</strong></td>
+                            <td>{{ $director->position }}</td>
+                            <td>{{ $director->details ?: 'No additional details provided.' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-muted">No committee members have been published.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">{{ $directors->links() }}</div>
         </div>
-
-        <div class="grid grid-3">
-            @forelse($directors as $director)
-                <article class="card">
-                    <h3>{{ $director->name }}</h3>
-                    <p class="muted">{{ $director->position }}</p>
-                    @if($director->committee)
-                        <p><span class="badge">{{ $director->committee }}</span></p>
-                    @endif
-                    @if($director->details)
-                        <p>{{ $director->details }}</p>
-                    @endif
-                </article>
-            @empty
-                <p>No committee members published.</p>
-            @endforelse
-        </div>
-
-        <div class="pagination">{{ $directors->links() }}</div>
     </section>
 @endsection
