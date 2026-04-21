@@ -1,31 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card">
-        <div class="section-header">
-            <h1>Photo Gallery</h1>
-            <span class="badge">Moments & Memories</span>
-        </div>
+    <section class="panel">
+        <h3 class="panel-header">Photo Gallery</h3>
+        <div class="panel-body">
+            <div class="grid-3">
+                @forelse($galleries as $item)
+                    <article class="gallery-item">
+                        @if($item->image)
+                            <img src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->title }}">
+                        @endif
+                        <h4 style="margin:10px 0 6px;font-size:15px;color:#174976;">{{ $item->title }}</h4>
+                        <p class="text-muted" style="margin:0 0 6px;">
+                            <strong>Category:</strong> {{ $item->category ?? 'General' }}
+                        </p>
+                        @if($item->description)
+                            <p class="text-muted" style="margin:0;">
+                                {{ \Illuminate\Support\Str::limit($item->description, 120) }}
+                            </p>
+                        @endif
+                    </article>
+                @empty
+                    <p class="text-muted">No gallery entries found.</p>
+                @endforelse
+            </div>
 
-        <div class="grid grid-3">
-            @forelse($galleries as $item)
-                <article class="card">
-                    <h3>{{ $item->title }}</h3>
-                    @if($item->image)
-                        <img class="preview" src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->title }}">
-                    @endif
-                    <p class="muted mt-2"><strong>Category:</strong> {{ $item->category ?? 'General' }}</p>
-                    @if($item->description)
-                        <p class="mt-2">{{ \Illuminate\Support\Str::limit($item->description, 180) }}</p>
-                    @endif
-                </article>
-            @empty
-                <p>No gallery entries found.</p>
-            @endforelse
+            <div class="pagination">
+                {{ $galleries->links() }}
+            </div>
         </div>
-
-        <div class="pagination">
-            {{ $galleries->links() }}
-        </div>
-    </div>
+    </section>
 @endsection

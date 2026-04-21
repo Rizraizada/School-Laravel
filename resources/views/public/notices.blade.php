@@ -1,26 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card">
-        <div class="section-header">
-            <h1>All Notices</h1>
-        </div>
-
-        @forelse($notices as $notice)
-            <div class="notice">
-                <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-                    <strong>{{ $notice->title }}</strong>
-                    <small class="muted">{{ $notice->date->format('d M Y') }}</small>
-                </div>
-                @if($notice->badge)
-                    <span class="badge mt-2">{{ $notice->badge }}</span>
-                @endif
-                <p class="mt-2">{{ $notice->content }}</p>
+    <section class="panel">
+        <h2 class="panel-header">Notice Board</h2>
+        <div class="panel-body">
+            <div class="portal-table-wrap">
+                <table class="portal-table">
+                    <thead>
+                    <tr>
+                        <th style="width:80px;">SL</th>
+                        <th>Notice Title</th>
+                        <th style="width:160px;">Publish Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($notices as $notice)
+                        <tr>
+                            <td>{{ $loop->iteration + (($notices->currentPage() - 1) * $notices->perPage()) }}</td>
+                            <td>
+                                <strong>{{ $notice->title }}</strong>
+                                @if($notice->badge)
+                                    <div style="margin-top:5px;">
+                                        <span class="pill">{{ $notice->badge }}</span>
+                                    </div>
+                                @endif
+                                <div class="text-muted" style="margin-top:6px;">
+                                    {{ \Illuminate\Support\Str::limit($notice->content, 220) }}
+                                </div>
+                            </td>
+                            <td>{{ $notice->date->format('d M, Y') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-muted">No notices found.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
             </div>
-        @empty
-            <p class="muted">No notices found.</p>
-        @endforelse
-
-        <div class="pagination">{{ $notices->links() }}</div>
-    </div>
+            <div class="pagination">{{ $notices->links() }}</div>
+        </div>
+    </section>
 @endsection
