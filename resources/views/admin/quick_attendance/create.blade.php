@@ -7,6 +7,7 @@
         <h2 style="margin-top:0;">Add Quick Attendance</h2>
         <form method="POST" action="{{ route('admin.quick-attendance.store') }}">
             @csrf
+            @php($record = new \App\Models\QuickAttendance())
             @include('admin.quick_attendance._form')
             <div style="margin-top: 14px;">
                 <button class="btn" type="submit">Save</button>

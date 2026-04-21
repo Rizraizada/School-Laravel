@@ -11,10 +11,13 @@ use App\Http\Controllers\Admin\SchoolClassController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StudentResultController;
+use App\Http\Controllers\Admin\SubjectConfigController;
 use App\Http\Controllers\Admin\TeacherSectionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicResultController;
 use App\Http\Controllers\PublicSiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +28,7 @@ Route::get('/committee', [PublicSiteController::class, 'committee'])->name('publ
 Route::get('/staff', [PublicSiteController::class, 'staff'])->name('public.staff');
 Route::get('/messages', [PublicSiteController::class, 'messages'])->name('public.messages');
 Route::get('/contact', [PublicSiteController::class, 'contact'])->name('public.contact');
+Route::get('/student-result', [PublicResultController::class, 'index'])->name('public.results');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -54,6 +58,28 @@ Route::middleware('auth')->group(function (): void {
         ->except(['show'])
         ->names('admin.quick-attendance')
         ->middleware('role:teacher,headmaster,admin');
+
+    Route::get('/student-results', [StudentResultController::class, 'index'])
+        ->name('admin.student-results.index')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::get('/student-results/create', [StudentResultController::class, 'create'])
+        ->name('admin.student-results.create')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::post('/student-results', [StudentResultController::class, 'store'])
+        ->name('admin.student-results.store')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::get('/student-results/{studentResult}/edit', [StudentResultController::class, 'edit'])
+        ->name('admin.student-results.edit')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::put('/student-results/{studentResult}', [StudentResultController::class, 'update'])
+        ->name('admin.student-results.update')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::delete('/student-results/{studentResult}', [StudentResultController::class, 'destroy'])
+        ->name('admin.student-results.destroy')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::delete('/student-results', [StudentResultController::class, 'bulkDestroy'])
+        ->name('admin.student-results.bulk-destroy')
+        ->middleware('role:teacher,headmaster,admin');
 });
 
 Route::prefix('admin')
@@ -69,6 +95,7 @@ Route::prefix('admin')
         Route::resource('galleries', GalleryController::class)->except(['show']);
         Route::resource('directors', BoardDirectorController::class)->except(['show']);
         Route::resource('activities', ActivityController::class)->except(['show']);
+        Route::resource('subject-config', SubjectConfigController::class)->except(['show']);
 
         Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
         Route::post('/sections', [SectionController::class, 'store'])->name('sections.store');

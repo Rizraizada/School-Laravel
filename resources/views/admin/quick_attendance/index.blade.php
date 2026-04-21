@@ -17,6 +17,7 @@
                     <th>Class / Section</th>
                     <th>Male</th>
                     <th>Female</th>
+                    <th>Total</th>
                     <th>Recorded By</th>
                     <th>Actions</th>
                 </tr>
@@ -28,6 +29,7 @@
                         <td>{{ $record->section->schoolClass->class_name }} - {{ $record->section->section_name }}</td>
                         <td>{{ $record->male_count }}</td>
                         <td>{{ $record->female_count }}</td>
+                        <td>{{ $record->total_students }}</td>
                         <td>{{ $record->recorder?->full_name ?? 'N/A' }}</td>
                         <td>
                             <div class="inline-actions">
@@ -41,7 +43,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6">No records found.</td></tr>
+                    <tr><td colspan="7">No records found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

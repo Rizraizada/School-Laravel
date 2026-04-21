@@ -15,11 +15,16 @@ class QuickAttendance extends Model
         'attendance_date',
         'male_count',
         'female_count',
+        'total_male',
+        'total_female',
+        'total_students',
+        'absent_student_ids',
         'recorded_by',
     ];
 
     protected $casts = [
         'attendance_date' => 'date',
+        'absent_student_ids' => 'array',
     ];
 
     public function section(): BelongsTo

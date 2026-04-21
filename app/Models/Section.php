@@ -15,6 +15,9 @@ class Section extends Model
     protected $fillable = [
         'section_name',
         'class_id',
+        'total_male',
+        'total_female',
+        'total_students',
     ];
 
     public function schoolClass(): BelongsTo
@@ -37,5 +40,10 @@ class Section extends Model
     public function quickAttendances(): HasMany
     {
         return $this->hasMany(QuickAttendance::class);
+    }
+
+    public function studentResults(): HasMany
+    {
+        return $this->hasMany(StudentResult::class);
     }
 }

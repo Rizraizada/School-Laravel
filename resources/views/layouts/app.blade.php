@@ -496,6 +496,7 @@
                 <li><a class="{{ request()->routeIs('public.staff') ? 'active' : '' }}" href="{{ route('public.staff') }}">Staff</a></li>
                 <li><a class="{{ request()->routeIs('public.messages') ? 'active' : '' }}" href="{{ route('public.messages') }}">Message</a></li>
                 <li><a class="{{ request()->routeIs('public.contact') ? 'active' : '' }}" href="{{ route('public.contact') }}">Contact</a></li>
+                <li><a class="{{ request()->routeIs('public.results') ? 'active' : '' }}" href="{{ route('public.results') }}">Result Search</a></li>
             </ul>
         </div>
     </nav>
@@ -529,6 +530,7 @@
                                 <li><a href="{{ route('public.committee') }}">Managing Committee</a></li>
                                 <li><a href="{{ route('public.staff') }}">Teachers & Staff</a></li>
                                 <li><a href="{{ route('public.contact') }}">School Contact</a></li>
+                                <li><a href="{{ route('public.results') }}">Public Result Search</a></li>
                             </ul>
                         </div>
                     </div>
@@ -537,7 +539,7 @@
                         <div class="widget-content">
                             <ul class="link-list">
                                 <li><a href="{{ route('login') }}">Student Profile Login</a></li>
-                                <li><a href="{{ route('login') }}">Result & Certificate Verification</a></li>
+                                <li><a href="{{ route('public.results') }}">Result & Certificate Verification</a></li>
                                 <li><a href="{{ route('login') }}">Admission and Transfer Services</a></li>
                                 <li><a href="{{ route('login') }}">Attendance Monitoring</a></li>
                             </ul>
@@ -570,6 +572,7 @@
                 <li><a href="{{ route('home') }}">First Page</a></li>
                 <li><a href="{{ route('public.notices') }}">Notice Board</a></li>
                 <li><a href="{{ route('public.contact') }}">School Contact</a></li>
+                <li><a href="{{ route('public.results') }}">Result Search</a></li>
             </ul>
         </div>
     </div>
