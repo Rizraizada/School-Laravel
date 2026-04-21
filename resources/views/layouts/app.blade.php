@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? config('app.name', 'School Management') }}</title>
+    <title>{{ $title ?? config('app.name', 'Bharasar High School') }}</title>
     <style>
         :root {
-            --portal-blue: #0f4e8a;
-            --portal-blue-dark: #08345e;
-            --portal-accent: #f6d870;
+            --portal-blue: #0a5f43;
+            --portal-blue-dark: #084b35;
+            --portal-accent: #f3ce4b;
             --portal-border: #d5dde7;
             --portal-text: #243043;
             --portal-muted: #627087;
-            --portal-bg: #f3f7fb;
+            --portal-bg: #f0f4f9;
             --portal-danger: #b42318;
             --portal-success: #0f7f44;
+            --portal-nav: #ba1f2d;
+            --portal-nav-dark: #971825;
         }
         * { box-sizing: border-box; }
         body {
@@ -52,7 +54,7 @@
             text-decoration: none;
         }
         .portal-header {
-            background: linear-gradient(180deg, #2f78b9 0%, #0f4e8a 100%);
+            background: linear-gradient(180deg, #11855f 0%, #0a5f43 100%);
             border-bottom: 4px solid var(--portal-accent);
             color: #fff;
         }
@@ -74,28 +76,28 @@
         .portal-logo {
             width: 62px;
             height: 62px;
-            border-radius: 50%;
+            border-radius: 12px;
             border: 2px solid rgba(255, 255, 255, 0.75);
-            background: radial-gradient(circle at 30% 30%, #f9e27a 10%, #debe4f 60%, #c0972b 100%);
+            background: linear-gradient(180deg, #e9494f 0%, #ba1f2d 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #233b5b;
-            font-size: 11px;
+            color: #fff;
+            font-size: 15px;
             font-weight: 700;
             text-align: center;
             line-height: 1.2;
         }
         .portal-title h1 {
             margin: 0;
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             letter-spacing: 0.3px;
         }
         .portal-title p {
             margin: 4px 0 0;
             font-size: 14px;
-            color: #dce9f7;
+            color: #d9f7eb;
         }
         .portal-auth-block {
             display: flex;
@@ -115,7 +117,7 @@
             cursor: pointer;
         }
         .portal-nav {
-            background: #08345e;
+            background: var(--portal-nav);
             border-top: 1px solid rgba(255, 255, 255, 0.12);
             border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         }
@@ -136,7 +138,7 @@
         }
         .portal-nav a.active,
         .portal-nav a:hover {
-            background: #0f4e8a;
+            background: var(--portal-nav-dark);
         }
         .portal-alert-line {
             background: #fff6db;
@@ -280,7 +282,7 @@
             margin: 0;
             font-size: 15px;
             color: #fff;
-            background: linear-gradient(180deg, #2c6ba4 0%, #114776 100%);
+            background: linear-gradient(180deg, #14845f 0%, #0a5f43 100%);
             padding: 9px 11px;
             border-bottom: 1px solid #0d375e;
         }
@@ -393,7 +395,7 @@
             color: #0f4e8a;
         }
         .portal-footer {
-            border-top: 4px solid #0f4e8a;
+            border-top: 4px solid var(--portal-blue);
             background: #e8eff8;
             margin-top: 26px;
             font-size: 13px;
@@ -453,7 +455,7 @@
 @php($fullWidth = trim($__env->yieldContent('full_width')) === '1')
 <div class="portal-topbar">
     <div class="container portal-topbar-inner">
-        <span>Welcome to National Portal</span>
+        <span>Government Education Web Portal</span>
         <div class="portal-topbar-links">
             <a href="{{ route('home') }}">Home</a>
             <a href="{{ route('public.contact') }}">Contact</a>
@@ -465,10 +467,10 @@
 <header class="portal-header">
     <div class="container portal-branding">
         <a class="portal-brand-main" href="{{ route('home') }}">
-            <div class="portal-logo">Gov<br>Portal</div>
+            <div class="portal-logo">BHS</div>
             <div class="portal-title">
-                <h1>School Management Portal</h1>
-                <p>Board Information, Notice Board, e-Services and Public Communication</p>
+                <h1>Bharasar High School</h1>
+                <p>Official School Portal: Notices, Academic Updates, Results and Public Information</p>
             </div>
         </a>
         <div class="portal-auth-block">
@@ -499,7 +501,7 @@
     </nav>
     <div class="portal-alert-line">
         <div class="container">
-            <p><strong>Alert:</strong> Avoid unofficial financial transactions. All official communication is published through this portal notice board.</p>
+            <p><strong>Notice:</strong> Follow only official instructions published by Bharasar High School through this portal.</p>
         </div>
     </div>
 </header>
@@ -524,19 +526,19 @@
                             <ul class="link-list">
                                 <li><a href="{{ route('public.notices') }}">Latest Notices</a></li>
                                 <li><a href="{{ route('public.gallery') }}">Photo Gallery</a></li>
-                                <li><a href="{{ route('public.committee') }}">Board Committee</a></li>
-                                <li><a href="{{ route('public.staff') }}">Staff Directory</a></li>
-                                <li><a href="{{ route('public.contact') }}">Office Contact</a></li>
+                                <li><a href="{{ route('public.committee') }}">Managing Committee</a></li>
+                                <li><a href="{{ route('public.staff') }}">Teachers & Staff</a></li>
+                                <li><a href="{{ route('public.contact') }}">School Contact</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="widget">
-                        <h3>Internal e-Services</h3>
+                        <h3>Student e-Services</h3>
                         <div class="widget-content">
                             <ul class="link-list">
-                                <li><a href="{{ route('login') }}">Online Application Tracking</a></li>
-                                <li><a href="{{ route('login') }}">Certificate Verification</a></li>
-                                <li><a href="{{ route('login') }}">Name & Age Correction</a></li>
+                                <li><a href="{{ route('login') }}">Student Profile Login</a></li>
+                                <li><a href="{{ route('login') }}">Result & Certificate Verification</a></li>
+                                <li><a href="{{ route('login') }}">Admission and Transfer Services</a></li>
                                 <li><a href="{{ route('login') }}">Attendance Monitoring</a></li>
                             </ul>
                         </div>
@@ -551,15 +553,15 @@
 <footer class="portal-footer">
     <div class="container portal-footer-grid">
         <div>
-            <h4>Board Information</h4>
-            <p>School Management Portal centralizes notices, academic updates, and administrative communication.</p>
+            <h4>About Bharasar High School</h4>
+            <p>Bharasar High School publishes official notices, academic updates, and institutional information through this portal.</p>
         </div>
         <div>
-            <h4>Citizen Services</h4>
+            <h4>Public Services</h4>
             <ul>
                 <li>Public notice publication</li>
-                <li>Committee and staff information</li>
-                <li>Institution contact directory</li>
+                <li>Managing committee and staff information</li>
+                <li>School office contact directory</li>
             </ul>
         </div>
         <div>
@@ -567,12 +569,12 @@
             <ul>
                 <li><a href="{{ route('home') }}">First Page</a></li>
                 <li><a href="{{ route('public.notices') }}">Notice Board</a></li>
-                <li><a href="{{ route('public.contact') }}">Site Map & Contact</a></li>
+                <li><a href="{{ route('public.contact') }}">School Contact</a></li>
             </ul>
         </div>
     </div>
     <div class="container portal-footer-bottom">
-        Site updated dynamically from the school CMS panel.
+        Official portal of Bharasar High School. Site updated from school CMS panel.
     </div>
 </footer>
 </body>

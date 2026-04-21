@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="panel">
-        <h3 class="panel-header">Board Committee & Directors</h3>
+        <h3 class="panel-header">Managing Committee</h3>
         <div class="panel-body">
             <div class="portal-table-wrap">
                 <table class="portal-table">

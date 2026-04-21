@@ -4,11 +4,11 @@
     <section class="panel">
         <div class="panel-body hero">
             <div class="hero-feature">
-                <h2>Board of Intermediate & Secondary Education Portal</h2>
+                <h2>Welcome to Bharasar High School Portal</h2>
                 <p>
-                    This portal publishes official notices, board activities, committee information, and
-                    public-facing administrative updates. Citizens, teachers, and institutions can use
-                    this platform as the authentic source of school board announcements.
+                    This portal publishes official notices, academic activities, managing committee information,
+                    and public-facing administrative updates. Students, guardians, teachers, and community members
+                    can use this platform as the authentic source of Bharasar High School announcements.
                 </p>
             </div>
             <div class="hero-slider">
@@ -52,7 +52,7 @@
 
     <div class="two-col">
         <section class="panel">
-            <h3 class="panel-header">Recent Activities</h3>
+            <h3 class="panel-header">Recent School Activities</h3>
             <div class="panel-body">
                 @forelse($activities as $activity)
                     <article class="mini-card">
@@ -90,7 +90,7 @@
 
 @section('sidebar')
     <div class="widget">
-        <h3>Latest Activities</h3>
+        <h3>Latest School Activities</h3>
         <div class="widget-content">
             <ul class="link-list">
                 @forelse($activities->take(5) as $activity)
@@ -106,12 +106,12 @@
         </div>
     </div>
     <div class="widget">
-        <h3>Public Communication</h3>
+        <h3>School Information</h3>
         <div class="widget-content">
             <ul class="link-list">
                 <li><a href="{{ route('public.contact') }}">Office Contact Details</a></li>
-                <li><a href="{{ route('public.staff') }}">Department Staff Directory</a></li>
-                <li><a href="{{ route('public.committee') }}">Board Committee Information</a></li>
+                <li><a href="{{ route('public.staff') }}">Teacher & Staff Directory</a></li>
+                <li><a href="{{ route('public.committee') }}">Managing Committee Information</a></li>
             </ul>
         </div>
     </div>
