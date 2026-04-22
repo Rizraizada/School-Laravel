@@ -6,7 +6,10 @@
     <div class="card">
         <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <h2 style="margin:0;">Student Records</h2>
-            <a class="btn" href="{{ route('admin.students.create') }}">Add Student</a>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a class="btn" href="{{ route('admin.students.create') }}">Add Students</a>
+                <a class="btn" href="{{ route('admin.students.promotion') }}">Student Promotion</a>
+            </div>
         </div>
 
         <div class="table-wrap">
