@@ -54,4 +54,34 @@
             </table>
         </div>
     </section>
+
+    @if(isset($branches) && $branches->isNotEmpty())
+        <section class="panel">
+            <h3 class="panel-header">Branch Directory</h3>
+            <div class="panel-body portal-table-wrap">
+                <table class="portal-table">
+                    <thead>
+                    <tr>
+                        <th>Branch</th>
+                        <th>Incharge</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($branches as $branch)
+                        <tr>
+                            <td>{{ $branch->branch_name }}</td>
+                            <td>{{ $branch->branch_incharge ?: '-' }}</td>
+                            <td>{{ $branch->branch_address ?: '-' }}</td>
+                            <td>{{ $branch->branch_phone ?: '-' }}</td>
+                            <td>{{ $branch->branch_email ?: '-' }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @endif
 @endsection

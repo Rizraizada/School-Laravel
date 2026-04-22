@@ -86,6 +86,16 @@
             </div>
         </section>
     </div>
+
+    <section class="panel">
+        <h3 class="panel-header">Student Result Search</h3>
+        <div class="panel-body">
+            <p class="text-muted" style="margin-top:0;">
+                Search individual results by student name, roll number, registration number, class, section, or year.
+            </p>
+            <a class="btn" href="{{ route('public.results') }}">Open Result Search</a>
+        </div>
+    </section>
 @endsection
 
 @section('sidebar')

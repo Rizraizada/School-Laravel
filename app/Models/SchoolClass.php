@@ -20,4 +20,14 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Section::class, 'class_id');
     }
+
+    public function studentResults(): HasMany
+    {
+        return $this->hasMany(StudentResult::class, 'class_id');
+    }
+
+    public function subjectConfigs(): HasMany
+    {
+        return $this->hasMany(SubjectConfig::class, 'class_id');
+    }
 }

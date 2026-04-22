@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Award;
+use App\Models\Branch;
 use App\Models\BoardDirector;
 use App\Models\Gallery;
 use App\Models\Notice;
@@ -62,6 +63,8 @@ class PublicSiteController extends Controller
 
     public function contact(): View
     {
-        return view('public.contact');
+        return view('public.contact', [
+            'branches' => Branch::orderBy('branch_name')->get(),
+        ]);
     }
 }
