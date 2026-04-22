@@ -40,6 +40,13 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/students/promotion', [StudentController::class, 'promotionForm'])
+        ->name('admin.students.promotion')
+        ->middleware('role:teacher,headmaster,admin');
+    Route::post('/students/promotion', [StudentController::class, 'promote'])
+        ->name('admin.students.promote')
+        ->middleware('role:teacher,headmaster,admin');
+
     Route::resource('students', StudentController::class)
         ->except(['show'])
         ->names('admin.students')

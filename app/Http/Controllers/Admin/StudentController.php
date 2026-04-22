@@ -32,6 +32,14 @@ class StudentController extends Controller
         ]);
     }
 
+    public function promotionForm(): View
+    {
+        return view('admin.students.promotion', [
+            'classes' => SchoolClass::orderBy('class_name')->get(),
+            'sections' => Section::with('schoolClass')->orderBy('section_name')->get(),
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -125,5 +133,47 @@ class StudentController extends Controller
         $student->delete();
 
         return redirect()->route('admin.students.index')->with('success', 'Student deleted successfully.');
+    }
+
+    public function promote(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'from_class_id' => ['required', 'exists:classes,id'],
+            'from_section_id' => ['required', 'exists:sections,id'],
+            'to_class_id' => ['required', 'exists:classes,id', 'different:from_class_id'],
+            'to_section_id' => ['required', 'exists:sections,id', 'different:from_section_id'],
+        ]);
+
+        $fromSectionMatchesClass = Section::query()
+            ->whereKey($data['from_section_id'])
+            ->where('class_id', $data['from_class_id'])
+            ->exists();
+        if (! $fromSectionMatchesClass) {
+            return back()
+                ->withErrors(['from_section_id' => 'Selected source section does not belong to selected source class.'])
+                ->withInput();
+        }
+
+        $toSectionMatchesClass = Section::query()
+            ->whereKey($data['to_section_id'])
+            ->where('class_id', $data['to_class_id'])
+            ->exists();
+        if (! $toSectionMatchesClass) {
+            return back()
+                ->withErrors(['to_section_id' => 'Selected target section does not belong to selected target class.'])
+                ->withInput();
+        }
+
+        $updated = Student::query()
+            ->where('section_id', $data['from_section_id'])
+            ->update(['section_id' => $data['to_section_id']]);
+
+        if ($updated === 0) {
+            return back()->with('status', 'No students found in the selected source section.');
+        }
+
+        return redirect()
+            ->route('admin.students.index')
+            ->with('success', "{$updated} student(s) promoted successfully.");
     }
 }
