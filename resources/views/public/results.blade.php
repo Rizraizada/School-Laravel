@@ -13,6 +13,18 @@
                         <input id="search" type="text" name="search" value="{{ $filters['search'] ?? '' }}">
                     </div>
                     <div class="form-group">
+                        <label for="exam_id">Exam</label>
+                        <select id="exam_id" name="exam_id">
+                            <option value="">All exams</option>
+                            @foreach($exams as $exam)
+                                <option value="{{ $exam->id }}" @selected(($filters['exam_id'] ?? null) == $exam->id)>
+                                    {{ $exam->exam_name }} ({{ $exam->exam_year }}) - {{ $exam->schoolClass?->class_name }}
+                                    {{ $exam->section?->section_name ? '('.$exam->section->section_name.')' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="exam_year">Exam Year</label>
                         <input id="exam_year" type="number" name="exam_year" min="2000" max="2100" value="{{ $filters['exam_year'] ?? '' }}">
                     </div>
@@ -70,7 +82,7 @@
                             <td>{{ $result->roll_no ?: '-' }}</td>
                             <td>{{ $result->schoolClass?->class_name ?? $result->class_level ?? '-' }}</td>
                             <td>{{ $result->section?->section_name ?? $result->section_name ?? '-' }}</td>
-                            <td>{{ $result->exam_name }}</td>
+                        <td>{{ $result->exam?->exam_name ?? $result->exam_name }}</td>
                             <td>{{ $result->exam_year }}</td>
                             <td>{{ $result->total_marks ?? '-' }}</td>
                             <td>{{ $result->gpa ?? '-' }}</td>
@@ -94,6 +106,7 @@
             <table class="portal-table">
                 <thead>
                 <tr>
+                    <th>Exam</th>
                     <th>Class</th>
                     <th>Section</th>
                     <th>Year</th>
@@ -104,6 +117,7 @@
                 <tbody>
                 @forelse($summary as $row)
                     <tr>
+                        <td>{{ $row->exam?->exam_name ?? '-' }}</td>
                         <td>{{ $row->schoolClass?->class_name ?? '-' }}</td>
                         <td>{{ $row->section?->section_name ?? '-' }}</td>
                         <td>{{ $row->exam_year }}</td>
@@ -112,7 +126,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-muted">No grouped summary available.</td>
+                        <td colspan="6" class="text-muted">No grouped summary available.</td>
                     </tr>
                 @endforelse
                 </tbody>

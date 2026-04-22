@@ -191,6 +191,7 @@
             <a href="{{ route('admin.attendance.index') }}">Attendance</a>
             <a href="{{ route('admin.attendance.report') }}">Attendance Report</a>
             <a href="{{ route('admin.quick-attendance.index') }}">Quick Attendance</a>
+            <a href="{{ route('admin.exams.index') }}">Exams</a>
             <a href="{{ route('admin.student-results.index') }}">Student Results</a>
 
             @if(auth()->user()->isAdminLike())
@@ -198,7 +199,7 @@
                 <a href="{{ route('admin.classes.index') }}">Classes</a>
                 <a href="{{ route('admin.sections.index') }}">Sections</a>
                 <a href="{{ route('admin.teacher-sections.index') }}">Teacher Sections</a>
-                <a href="{{ route('admin.subject-config.index') }}">Subject Config</a>
+                <a href="{{ route('admin.subject-config.index') }}">Subject Rules</a>
                 <a href="{{ route('admin.notices.index') }}">Notices</a>
                 <a href="{{ route('admin.sliders.index') }}">Sliders</a>
                 <a href="{{ route('admin.awards.index') }}">Awards</a>

@@ -50,6 +50,7 @@
                     <th>Subject</th>
                     <th>Type</th>
                     <th>Marks (Full/Pass)</th>
+                    <th>Rules</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -63,6 +64,11 @@
                         <td>{{ $config->subject_name }}</td>
                         <td>{{ ucfirst($config->subject_type) }}</td>
                         <td>{{ $config->full_mark }} / {{ $config->pass_mark }}</td>
+                        <td>
+                            {{ $config->is_optional ? 'Optional' : 'Regular' }}<br>
+                            GPA: {{ $config->include_in_gpa ? 'Yes' : 'No' }}<br>
+                            Total: {{ $config->include_in_total_score ? 'Yes' : 'No' }}
+                        </td>
                         <td>{{ $config->is_active ? 'Active' : 'Inactive' }}</td>
                         <td>
                             <div class="inline-actions">
@@ -76,7 +82,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8">No subject configurations found.</td></tr>
+                    <tr><td colspan="9">No subject configurations found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

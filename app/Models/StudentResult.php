@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class StudentResult extends Model
 {
@@ -14,6 +15,7 @@ class StudentResult extends Model
         'student_id',
         'class_id',
         'section_id',
+        'exam_id',
         'recorded_by',
         'student_name',
         'roll_no',
@@ -50,6 +52,7 @@ class StudentResult extends Model
     {
         return [
             'exam_year' => 'integer',
+            'exam_id' => 'integer',
             'bangla' => 'decimal:2',
             'english' => 'decimal:2',
             'mathematics' => 'decimal:2',
@@ -85,8 +88,18 @@ class StudentResult extends Model
         return $this->belongsTo(Section::class);
     }
 
+    public function exam(): BelongsTo
+    {
+        return $this->belongsTo(Exam::class);
+    }
+
     public function recorder(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(StudentResultItem::class)->orderBy('sort_order')->orderBy('id');
     }
 }

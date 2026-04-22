@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\SchoolClass;
+use App\Models\Section;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -54,5 +56,17 @@ class DatabaseSeeder extends Seeder
                 'position' => 'Teacher',
             ]
         );
+
+        foreach (['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'] as $className) {
+            $schoolClass = SchoolClass::firstOrCreate(['class_name' => $className]);
+            foreach (['A', 'B'] as $sectionName) {
+                Section::firstOrCreate([
+                    'class_id' => $schoolClass->id,
+                    'section_name' => $sectionName,
+                ]);
+            }
+        }
+
+        $this->call(BangladeshCurriculumSeeder::class);
     }
 }

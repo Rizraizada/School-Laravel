@@ -6,45 +6,49 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SubjectConfig extends Model
+class StudentResultItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'subject_config';
-
     protected $fillable = [
-        'class_id',
-        'class_level',
-        'group_name',
+        'student_result_id',
+        'exam_subject_id',
         'subject_id',
-        'subject_code',
         'subject_name',
-        'subject_type',
+        'subject_code',
+        'obtained_mark',
         'full_mark',
         'pass_mark',
-        'subjective_mark',
-        'mcq_mark',
-        'practical_mark',
         'is_optional',
         'include_in_gpa',
         'include_in_total_score',
-        'is_active',
+        'gpa_point',
+        'grade_letter',
+        'is_passed',
         'sort_order',
     ];
 
     protected function casts(): array
     {
         return [
+            'obtained_mark' => 'decimal:2',
+            'gpa_point' => 'decimal:2',
             'is_optional' => 'boolean',
             'include_in_gpa' => 'boolean',
             'include_in_total_score' => 'boolean',
-            'is_active' => 'boolean',
+            'is_passed' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 
-    public function schoolClass(): BelongsTo
+    public function studentResult(): BelongsTo
     {
-        return $this->belongsTo(SchoolClass::class, 'class_id');
+        return $this->belongsTo(StudentResult::class);
+    }
+
+    public function examSubject(): BelongsTo
+    {
+        return $this->belongsTo(ExamSubject::class);
     }
 
     public function subject(): BelongsTo

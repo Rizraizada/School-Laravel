@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SchoolClass;
 use App\Models\Section;
 use App\Models\Student;
 use App\Models\User;
@@ -25,6 +26,7 @@ class StudentController extends Controller
     public function create(): View
     {
         return view('admin.students.create', [
+            'classes' => SchoolClass::orderBy('class_name')->get(),
             'sections' => Section::with('schoolClass')->orderBy('section_name')->get(),
             'teachers' => User::whereIn('role', ['teacher', 'headmaster', 'admin'])->orderBy('full_name')->get(),
         ]);
@@ -34,7 +36,12 @@ class StudentController extends Controller
     {
         $data = $request->validate([
             'user_id' => ['nullable', 'exists:users,id'],
+            'class_id' => ['required', 'exists:classes,id'],
             'section_id' => ['required', 'exists:sections,id'],
+            'roll_no' => ['nullable', 'string', 'max:50'],
+            'registration_no' => ['nullable', 'string', 'max:100'],
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'mother_name' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
@@ -45,7 +52,18 @@ class StudentController extends Controller
             'expertise' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $sectionMatchesClass = Section::query()
+            ->whereKey($data['section_id'])
+            ->where('class_id', $data['class_id'])
+            ->exists();
+        if (! $sectionMatchesClass) {
+            return back()
+                ->withErrors(['section_id' => 'Selected section does not belong to selected class.'])
+                ->withInput();
+        }
+
         $data['image'] = $this->storeUploadedFile($request->file('image'), 'students');
+        unset($data['class_id']);
 
         Student::create($data);
 
@@ -56,6 +74,7 @@ class StudentController extends Controller
     {
         return view('admin.students.edit', [
             'student' => $student,
+            'classes' => SchoolClass::orderBy('class_name')->get(),
             'sections' => Section::with('schoolClass')->orderBy('section_name')->get(),
             'teachers' => User::whereIn('role', ['teacher', 'headmaster', 'admin'])->orderBy('full_name')->get(),
         ]);
@@ -65,7 +84,12 @@ class StudentController extends Controller
     {
         $data = $request->validate([
             'user_id' => ['nullable', 'exists:users,id'],
+            'class_id' => ['required', 'exists:classes,id'],
             'section_id' => ['required', 'exists:sections,id'],
+            'roll_no' => ['nullable', 'string', 'max:50'],
+            'registration_no' => ['nullable', 'string', 'max:100'],
+            'father_name' => ['nullable', 'string', 'max:255'],
+            'mother_name' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
@@ -76,9 +100,20 @@ class StudentController extends Controller
             'expertise' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $sectionMatchesClass = Section::query()
+            ->whereKey($data['section_id'])
+            ->where('class_id', $data['class_id'])
+            ->exists();
+        if (! $sectionMatchesClass) {
+            return back()
+                ->withErrors(['section_id' => 'Selected section does not belong to selected class.'])
+                ->withInput();
+        }
+
         if ($request->hasFile('image')) {
             $data['image'] = $this->storeUploadedFile($request->file('image'), 'students');
         }
+        unset($data['class_id']);
 
         $student->update($data);
 

@@ -42,8 +42,11 @@ The UI follows a blue government-style visual theme inspired by:
 - Sections CRUD
 - Teacher-Section assignment CRUD
 - Students CRUD
+- Exams setup (dynamic subjects per exam)
 - Attendance bulk entry + report
 - Quick attendance CRUD
+- Dynamic student result entry (subjects auto-loaded from exam)
+- PDF download for result sheet
 - Notices CRUD
 - Slider CRUD
 - Awards CRUD
@@ -161,6 +164,7 @@ Open: `http://127.0.0.1:8000`
 - `/admin/classes/*`
 - `/admin/sections/*`
 - `/admin/teacher-sections/*`
+- `/exams/*` (teacher/headmaster/admin)
 - `/admin/notices/*`
 - `/admin/sliders/*`
 - `/admin/awards/*`
@@ -184,8 +188,13 @@ Open: `http://127.0.0.1:8000`
 - `app/Models/Section.php`
 - `app/Models/TeacherSection.php`
 - `app/Models/Student.php`
+- `app/Models/Subject.php`
+- `app/Models/Exam.php`
+- `app/Models/ExamSubject.php`
 - `app/Models/Attendance.php`
 - `app/Models/QuickAttendance.php`
+- `app/Models/StudentResult.php`
+- `app/Models/StudentResultItem.php`
 - `app/Models/Notice.php`
 - `app/Models/Slider.php`
 - `app/Models/Award.php`

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Exam;
 use App\Models\SchoolClass;
 use App\Models\Section;
 use App\Models\StudentResult;
@@ -14,14 +15,14 @@ class PublicResultController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
+            'exam_id' => ['nullable', 'integer', 'exists:exams,id'],
             'class_id' => ['nullable', 'integer', 'exists:classes,id'],
             'section_id' => ['nullable', 'integer', 'exists:sections,id'],
             'exam_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-            'exam_name' => ['nullable', 'string', 'max:100'],
         ]);
 
         $query = StudentResult::query()
-            ->with(['schoolClass', 'section'])
+            ->with(['schoolClass', 'section', 'exam'])
             ->orderByDesc('exam_year')
             ->orderBy('student_name');
 
@@ -47,19 +48,20 @@ class PublicResultController extends Controller
             $query->where('exam_year', $filters['exam_year']);
         }
 
-        if (! empty($filters['exam_name'])) {
-            $query->where('exam_name', $filters['exam_name']);
+        if (! empty($filters['exam_id'])) {
+            $query->where('exam_id', $filters['exam_id']);
         }
 
         $results = $query->paginate(20)->withQueryString();
 
         $summary = StudentResult::query()
-            ->selectRaw('class_id, section_id, exam_year, COUNT(*) as total_students, AVG(gpa) as avg_gpa')
+            ->selectRaw('class_id, section_id, exam_id, exam_year, COUNT(*) as total_students, AVG(gpa) as avg_gpa')
+            ->when(! empty($filters['exam_id']), fn ($builder) => $builder->where('exam_id', $filters['exam_id']))
             ->when(! empty($filters['class_id']), fn ($builder) => $builder->where('class_id', $filters['class_id']))
             ->when(! empty($filters['section_id']), fn ($builder) => $builder->where('section_id', $filters['section_id']))
             ->when(! empty($filters['exam_year']), fn ($builder) => $builder->where('exam_year', $filters['exam_year']))
-            ->groupBy('class_id', 'section_id', 'exam_year')
-            ->with(['schoolClass', 'section'])
+            ->groupBy('class_id', 'section_id', 'exam_id', 'exam_year')
+            ->with(['schoolClass', 'section', 'exam'])
             ->orderByDesc('exam_year')
             ->get();
 
@@ -68,7 +70,7 @@ class PublicResultController extends Controller
             'summary' => $summary,
             'classes' => SchoolClass::orderBy('class_name')->get(),
             'sections' => Section::with('schoolClass')->orderBy('section_name')->get(),
-            'examNames' => StudentResult::query()->select('exam_name')->distinct()->orderBy('exam_name')->pluck('exam_name'),
+            'exams' => Exam::with(['schoolClass', 'section'])->orderByDesc('exam_year')->orderBy('exam_name')->get(),
             'filters' => $filters,
         ]);
     }

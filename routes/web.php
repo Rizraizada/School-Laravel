@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\AwardController;
 use App\Http\Controllers\Admin\BoardDirectorController;
+use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NoticeController;
 use App\Http\Controllers\Admin\QuickAttendanceController;
@@ -59,6 +60,11 @@ Route::middleware('auth')->group(function (): void {
         ->names('admin.quick-attendance')
         ->middleware('role:teacher,headmaster,admin');
 
+    Route::resource('exams', ExamController::class)
+        ->except(['show'])
+        ->names('admin.exams')
+        ->middleware('role:teacher,headmaster,admin');
+
     Route::get('/student-results', [StudentResultController::class, 'index'])
         ->name('admin.student-results.index')
         ->middleware('role:teacher,headmaster,admin');
@@ -77,9 +83,17 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/student-results/{studentResult}', [StudentResultController::class, 'destroy'])
         ->name('admin.student-results.destroy')
         ->middleware('role:teacher,headmaster,admin');
+    Route::get('/student-results/{studentResult}/pdf', [StudentResultController::class, 'pdf'])
+        ->name('admin.student-results.pdf')
+        ->middleware('role:teacher,headmaster,admin');
     Route::delete('/student-results', [StudentResultController::class, 'bulkDestroy'])
         ->name('admin.student-results.bulk-destroy')
         ->middleware('role:teacher,headmaster,admin');
+
+    Route::resource('subject-config', SubjectConfigController::class)
+        ->except(['show'])
+        ->names('admin.subject-config')
+        ->middleware('role:headmaster,admin');
 });
 
 Route::prefix('admin')
@@ -95,7 +109,6 @@ Route::prefix('admin')
         Route::resource('galleries', GalleryController::class)->except(['show']);
         Route::resource('directors', BoardDirectorController::class)->except(['show']);
         Route::resource('activities', ActivityController::class)->except(['show']);
-        Route::resource('subject-config', SubjectConfigController::class)->except(['show']);
 
         Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
         Route::post('/sections', [SectionController::class, 'store'])->name('sections.store');

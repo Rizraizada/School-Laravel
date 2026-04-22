@@ -11,8 +11,10 @@
             <div class="stat"><p>Total Sections</p><h3>{{ $stats['sections'] }}</h3></div>
             <div class="stat"><p>Attendance Entries</p><h3>{{ $stats['attendances'] }}</h3></div>
             <div class="stat"><p>Quick Attendance</p><h3>{{ $stats['quick_attendances'] }}</h3></div>
+            <div class="stat"><p>Exams</p><h3>{{ $stats['exams'] }}</h3></div>
             <div class="stat"><p>Student Results</p><h3>{{ $stats['student_results'] }}</h3></div>
-            <div class="stat"><p>Subject Config</p><h3>{{ $stats['subject_configs'] }}</h3></div>
+            <div class="stat"><p>Master Subjects</p><h3>{{ $stats['subjects'] }}</h3></div>
+            <div class="stat"><p>Subject Rules</p><h3>{{ $stats['subject_configs'] }}</h3></div>
             <div class="stat"><p>Notices</p><h3>{{ $stats['notices'] }}</h3></div>
             <div class="stat"><p>Slider Images</p><h3>{{ $stats['sliders'] }}</h3></div>
             <div class="stat"><p>Activities</p><h3>{{ $stats['activities'] }}</h3></div>
