@@ -7,7 +7,9 @@
         <label for="class_id">Class *</label>
         <select id="class_id" name="class_id" required>
             <option value="">Select Class</option>
-            @php($selectedClassId = old('class_id', $student->section?->class_id))
+            @php
+                $selectedClassId = old('class_id', $student->section?->class_id);
+            @endphp
             @foreach($classes as $class)
                 <option value="{{ $class->id }}" @selected((string) $selectedClassId === (string) $class->id)>
                     {{ $class->class_name }}
