@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\StudentResult;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 class ResultPdfService
 {
@@ -199,14 +199,107 @@ PY;
         $process->run();
 
         if (! $process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+            return $this->buildFallbackPdf($payload);
         }
 
-        $output = $process->getOutput();
-        if ($output === '') {
-            throw new \RuntimeException('Failed to generate PDF content.');
+        try {
+            $output = $process->getOutput();
+            if ($output === '') {
+                return $this->buildFallbackPdf($payload);
+            }
+
+            return $output;
+        } catch (Throwable) {
+            return $this->buildFallbackPdf($payload);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function buildFallbackPdf(array $payload): string
+    {
+        $items = $payload['items'] ?? [];
+        $lines = [
+            ($payload['school_name'] ?? 'School').' - Student Result Sheet',
+            ($payload['exam_name'] ?? '').' - '.($payload['exam_year'] ?? ''),
+            ($payload['class_name'] ?? '').' ('.($payload['section_name'] ?? '').')',
+            '',
+            'Student: '.($payload['student_name'] ?? ''),
+            'Roll: '.($payload['roll_no'] ?? '').' | Registration: '.($payload['registration_no'] ?? ''),
+            'Father: '.($payload['father_name'] ?? ''),
+            'Mother: '.($payload['mother_name'] ?? ''),
+            'Result Status: '.($payload['result_status'] ?? ''),
+            '',
+            'Subject Marks:',
+        ];
+
+        foreach ($items as $item) {
+            $lines[] = sprintf(
+                '- %s [%s]: %s/%s | Pass %s | Grade %s | GPA %s | %s',
+                (string) ($item['subject_name'] ?? ''),
+                (string) ($item['subject_code'] ?? '-'),
+                (string) ($item['obtained_mark'] ?? '-'),
+                (string) ($item['full_mark'] ?? '-'),
+                (string) ($item['pass_mark'] ?? '-'),
+                (string) ($item['grade_letter'] ?? '-'),
+                (string) ($item['gpa_point'] ?? '-'),
+                (string) ($item['flags'] ?? '-')
+            );
         }
 
-        return $output;
+        $lines[] = '';
+        $lines[] = 'Total Marks: '.($payload['total_marks'] ?? '-');
+        $lines[] = 'GPA: '.($payload['gpa'] ?? '-');
+        $lines[] = 'Grade: '.($payload['grade'] ?? '-');
+        $lines[] = 'Merit Position: '.($payload['merit_position'] ?? '-');
+
+        return $this->buildSimplePdf($lines);
+    }
+
+    /**
+     * @param  array<int, string>  $lines
+     */
+    private function buildSimplePdf(array $lines): string
+    {
+        $escape = static fn (string $text): string => str_replace(
+            ['\\', '(', ')'],
+            ['\\\\', '\\(', '\\)'],
+            $text
+        );
+
+        $streamLines = ['BT', '/F1 10 Tf'];
+        $y = 810;
+        foreach (array_slice($lines, 0, 48) as $line) {
+            $streamLines[] = sprintf('1 0 0 1 40 %d Tm (%s) Tj', $y, $escape($line));
+            $y -= 14;
+        }
+        $streamLines[] = 'ET';
+        $stream = implode("\n", $streamLines);
+
+        $objects = [];
+        $objects[] = "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n";
+        $objects[] = "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n";
+        $objects[] = "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj\n";
+        $objects[] = "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n";
+        $objects[] = "5 0 obj << /Length ".strlen($stream)." >> stream\n".$stream."\nendstream endobj\n";
+
+        $pdf = "%PDF-1.4\n";
+        $offsets = [0];
+        foreach ($objects as $object) {
+            $offsets[] = strlen($pdf);
+            $pdf .= $object;
+        }
+
+        $xrefPosition = strlen($pdf);
+        $pdf .= 'xref'."\n".'0 '.(count($objects) + 1)."\n";
+        $pdf .= "0000000000 65535 f \n";
+        foreach (array_slice($offsets, 1) as $offset) {
+            $pdf .= sprintf("%010d 00000 n \n", $offset);
+        }
+        $pdf .= 'trailer << /Size '.(count($objects) + 1).' /Root 1 0 R >>'."\n";
+        $pdf .= "startxref\n".$xrefPosition."\n%%EOF";
+
+        return $pdf;
     }
 }
