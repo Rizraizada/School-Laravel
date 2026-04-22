@@ -13,12 +13,30 @@
 
     <div class="form-group">
         <label for="class_level">Class Level *</label>
-        <input id="class_level" type="text" name="class_level" value="{{ old('class_level', $subjectConfig->class_level ?? '') }}" required>
+        <input id="class_level" type="text" name="class_level" value="{{ old('class_level', $subjectConfig->class_level ?? '') }}" required placeholder="Example: Class 6">
     </div>
 
     <div class="form-group">
         <label for="group_name">Group Name</label>
-        <input id="group_name" type="text" name="group_name" value="{{ old('group_name', $subjectConfig->group_name ?? '') }}">
+        <input id="group_name" type="text" name="group_name" value="{{ old('group_name', $subjectConfig->group_name ?? '') }}" placeholder="General / Science / Commerce">
+    </div>
+
+    <div class="form-group">
+        <label for="subject_id">Master Subject</label>
+        <select id="subject_id" name="subject_id">
+            <option value="">Select subject</option>
+            @foreach($subjects as $subject)
+                <option
+                    value="{{ $subject->id }}"
+                    data-subject-name="{{ $subject->subject_name }}"
+                    data-subject-code="{{ $subject->subject_code }}"
+                    data-subject-type="{{ $subject->subject_type }}"
+                    @selected((string) old('subject_id', $subjectConfig->subject_id ?? '') === (string) $subject->id)
+                >
+                    {{ $subject->subject_name }}{{ $subject->subject_code ? ' ('.$subject->subject_code.')' : '' }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     <div class="form-group">
@@ -78,7 +96,23 @@
         <label>
             <input type="hidden" name="is_optional" value="0">
             <input type="checkbox" name="is_optional" value="1" @checked((string) $isOptional === '1')>
-            Is Optional Subject
+            Optional Subject
+        </label>
+    </div>
+    <div class="form-group">
+        @php($includeInGpa = old('include_in_gpa', (int) ($subjectConfig->include_in_gpa ?? true)))
+        <label>
+            <input type="hidden" name="include_in_gpa" value="0">
+            <input type="checkbox" name="include_in_gpa" value="1" @checked((string) $includeInGpa === '1')>
+            Include in GPA
+        </label>
+    </div>
+    <div class="form-group">
+        @php($includeInTotal = old('include_in_total_score', (int) ($subjectConfig->include_in_total_score ?? true)))
+        <label>
+            <input type="hidden" name="include_in_total_score" value="0">
+            <input type="checkbox" name="include_in_total_score" value="1" @checked((string) $includeInTotal === '1')>
+            Include in Total Score
         </label>
     </div>
     <div class="form-group">
@@ -95,3 +129,35 @@
     <button class="btn" type="submit">{{ $isEdit ? 'Update Configuration' : 'Save Configuration' }}</button>
     <a class="btn" style="background:#6b7280;" href="{{ route('admin.subject-config.index') }}">Cancel</a>
 </div>
+
+<script>
+    (() => {
+        const subjectSelect = document.getElementById('subject_id');
+        const subjectNameInput = document.getElementById('subject_name');
+        const subjectCodeInput = document.getElementById('subject_code');
+        const subjectTypeSelect = document.getElementById('subject_type');
+        if (!subjectSelect || !subjectNameInput || !subjectCodeInput || !subjectTypeSelect) {
+            return;
+        }
+
+        const syncFromMasterSubject = () => {
+            const option = subjectSelect.options[subjectSelect.selectedIndex];
+            if (!option || !option.value) {
+                return;
+            }
+
+            if (!subjectNameInput.value) {
+                subjectNameInput.value = option.dataset.subjectName || '';
+            }
+            if (!subjectCodeInput.value) {
+                subjectCodeInput.value = option.dataset.subjectCode || '';
+            }
+            if (option.dataset.subjectType) {
+                subjectTypeSelect.value = option.dataset.subjectType;
+            }
+        };
+
+        subjectSelect.addEventListener('change', syncFromMasterSubject);
+        syncFromMasterSubject();
+    })();
+</script>

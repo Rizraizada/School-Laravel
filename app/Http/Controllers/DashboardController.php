@@ -6,10 +6,12 @@ use App\Models\Activity;
 use App\Models\Attendance;
 use App\Models\Notice;
 use App\Models\QuickAttendance;
+use App\Models\Exam;
 use App\Models\Section;
 use App\Models\Slider;
 use App\Models\Student;
 use App\Models\StudentResult;
+use App\Models\Subject;
 use App\Models\SubjectConfig;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -28,7 +30,9 @@ class DashboardController extends Controller
                 'notices' => Notice::count(),
                 'sliders' => Slider::count(),
                 'activities' => Activity::count(),
+                'exams' => Exam::count(),
                 'student_results' => StudentResult::count(),
+                'subjects' => Subject::count(),
                 'subject_configs' => SubjectConfig::count(),
             ],
             'recentNotices' => Notice::orderByDesc('date')->limit(5)->get(),

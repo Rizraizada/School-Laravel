@@ -11,6 +11,18 @@
 
         <form method="GET" action="{{ route('admin.student-results.index') }}" class="form-grid" style="margin-top:14px;">
             <div class="form-group">
+                <label for="exam_id">Exam</label>
+                <select id="exam_id" name="exam_id">
+                    <option value="">All exams</option>
+                    @foreach($exams as $exam)
+                        <option value="{{ $exam->id }}" @selected(($filters['exam_id'] ?? null) == $exam->id)>
+                            {{ $exam->exam_name }} ({{ $exam->exam_year }}) - {{ $exam->schoolClass?->class_name }}
+                            {{ $exam->section?->section_name ? '('.$exam->section->section_name.')' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="student_name">Student Name</label>
                 <input id="student_name" type="text" name="student_name" value="{{ $filters['student_name'] ?? '' }}" placeholder="Search by name">
             </div>
@@ -99,6 +111,7 @@
                             <td>
                                 <div class="inline-actions">
                                     <a href="{{ route('admin.student-results.edit', $result) }}">Edit</a>
+                                    <a href="{{ route('admin.student-results.pdf', $result) }}">PDF</a>
                                     <form method="POST" action="{{ route('admin.student-results.destroy', $result) }}">
                                         @csrf
                                         @method('DELETE')
@@ -126,6 +139,7 @@
                 <thead>
                 <tr>
                     <th>Year</th>
+                    <th>Exam</th>
                     <th>Class</th>
                     <th>Section</th>
                     <th>Total Students</th>
@@ -136,6 +150,7 @@
                 @forelse($summary as $row)
                     <tr>
                         <td>{{ $row->exam_year }}</td>
+                        <td>{{ $row->exam?->exam_name ?? '-' }}</td>
                         <td>{{ $row->schoolClass?->class_name ?? '-' }}</td>
                         <td>{{ $row->section?->section_name ?? '-' }}</td>
                         <td>{{ $row->total_records }}</td>
@@ -143,7 +158,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">No summary data available.</td>
+                        <td colspan="6">No summary data available.</td>
                     </tr>
                 @endforelse
                 </tbody>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SchoolClass;
+use App\Models\Subject;
 use App\Models\SubjectConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -57,6 +58,10 @@ class SubjectConfigController extends Controller
         return view('admin.subject_configs.create', [
             'subjectConfig' => new SubjectConfig(),
             'classes' => SchoolClass::orderBy('class_name')->get(),
+            'subjects' => Subject::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('subject_name')
+                ->get(),
             'isEdit' => false,
         ]);
     }
@@ -76,6 +81,10 @@ class SubjectConfigController extends Controller
         return view('admin.subject_configs.edit', [
             'subjectConfig' => $subjectConfig,
             'classes' => SchoolClass::orderBy('class_name')->get(),
+            'subjects' => Subject::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('subject_name')
+                ->get(),
             'isEdit' => true,
         ]);
     }
@@ -107,6 +116,7 @@ class SubjectConfigController extends Controller
             'class_id' => ['nullable', 'exists:classes,id'],
             'class_level' => ['required', 'string', 'max:120'],
             'group_name' => ['nullable', 'string', 'max:120'],
+            'subject_id' => ['nullable', 'exists:subjects,id'],
             'subject_code' => ['nullable', 'string', 'max:40'],
             'subject_name' => ['required', 'string', 'max:255'],
             'subject_type' => ['required', 'string', 'max:120'],
@@ -116,10 +126,14 @@ class SubjectConfigController extends Controller
             'mcq_mark' => ['nullable', 'integer', 'min:0', 'max:500'],
             'practical_mark' => ['nullable', 'integer', 'min:0', 'max:500'],
             'is_optional' => ['nullable', 'boolean'],
+            'include_in_gpa' => ['nullable', 'boolean'],
+            'include_in_total_score' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:10000'],
         ]) + [
             'is_optional' => $request->boolean('is_optional'),
+            'include_in_gpa' => $request->boolean('include_in_gpa', true),
+            'include_in_total_score' => $request->boolean('include_in_total_score', true),
             'is_active' => $request->boolean('is_active', true),
             'sort_order' => (int) $request->input('sort_order', 0),
         ];
