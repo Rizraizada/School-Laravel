@@ -127,3 +127,6 @@
         <p style="margin-top:8px;"><img class="preview" src="{{ asset('storage/'.$student->image) }}" alt="student image"></p>
     @endif
 </div>
+<div class="form-group" style="margin-top:16px;">
+    <button type="submit" class="btn">{{ $isEdit ? 'Update Student' : 'Save Student' }}</button>
+</div>
