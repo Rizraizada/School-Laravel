@@ -84,9 +84,8 @@ class StudentResultController extends Controller
         $students = Student::with(['section.schoolClass'])->orderBy('name')->get();
 
         return view('admin.student_results.create', [
-            'record' => new StudentResult(),
             'students' => $students,
-            'studentMeta' => $students->mapWithKeys(fn (Student $student) => [$student->id => [
+            'studentMeta' => $students->map(fn (Student $student) => [
                 'id' => $student->id,
                 'name' => $student->name,
                 'roll_no' => $student->roll_no,
@@ -95,7 +94,9 @@ class StudentResultController extends Controller
                 'mother_name' => $student->mother_name,
                 'class_id' => $student->section?->class_id,
                 'section_id' => $student->section_id,
-            ]]),
+                'class_name' => $student->section?->schoolClass?->class_name,
+                'section_name' => $student->section?->section_name,
+            ])->values(),
             'classes' => SchoolClass::orderBy('class_name')->get(),
             'sections' => Section::with('schoolClass')->orderBy('section_name')->get(),
             'exams' => $exams,
@@ -115,6 +116,10 @@ class StudentResultController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($request->has('results')) {
+            return $this->storeBulk($request);
+        }
+
         $payload = $this->validatedPayload($request);
         [$exam, $student] = $this->resolveExamAndStudent($payload);
         $calculated = $this->calculateResult($payload, $exam);
@@ -148,6 +153,117 @@ class StudentResultController extends Controller
 
         return redirect()->route('admin.student-results.edit', $result)
             ->with('success', 'Student result created successfully.');
+    }
+
+    private function storeBulk(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'exam_id' => ['required', 'exists:exams,id'],
+            'section_id' => ['nullable', 'exists:sections,id'],
+            'results' => ['required', 'array', 'min:1'],
+            'results.*.student_id' => ['required', 'integer', 'exists:students,id'],
+            'results.*.marks' => ['nullable', 'array'],
+            'results.*.marks.*.exam_subject_id' => ['required', 'integer', 'exists:exam_subjects,id'],
+            'results.*.marks.*.obtained_mark' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $exam = Exam::query()
+            ->with(['schoolClass', 'section', 'subjects'])
+            ->findOrFail((int) $validated['exam_id']);
+        $forcedSectionId = isset($validated['section_id']) ? (int) $validated['section_id'] : null;
+
+        if ($exam->section_id !== null && $forcedSectionId !== null && (int) $exam->section_id !== $forcedSectionId) {
+            throw ValidationException::withMessages([
+                'section_id' => 'Selected section does not match the exam section.',
+            ]);
+        }
+
+        if ($forcedSectionId !== null) {
+            $sectionMatchesExamClass = Section::query()
+                ->whereKey($forcedSectionId)
+                ->where('class_id', (int) $exam->class_id)
+                ->exists();
+            if (! $sectionMatchesExamClass) {
+                throw ValidationException::withMessages([
+                    'section_id' => 'Selected section does not belong to the exam class.',
+                ]);
+            }
+        }
+
+        $rows = collect($validated['results'] ?? [])->values();
+        $studentIds = $rows->pluck('student_id')->map(fn ($id) => (int) $id)->unique()->values();
+        $students = Student::query()
+            ->with('section.schoolClass')
+            ->whereIn('id', $studentIds)
+            ->get()
+            ->keyBy('id');
+
+        $processed = 0;
+        foreach ($rows as $row) {
+            $studentId = (int) ($row['student_id'] ?? 0);
+            $marks = collect($row['marks'] ?? [])->values();
+            $hasAnyMark = $marks->contains(fn ($markRow) => ($markRow['obtained_mark'] ?? null) !== null && $markRow['obtained_mark'] !== '');
+            if (! $hasAnyMark) {
+                continue;
+            }
+
+            $hasBlankMark = $marks->contains(fn ($markRow) => ($markRow['obtained_mark'] ?? null) === null || $markRow['obtained_mark'] === '');
+            if ($hasBlankMark) {
+                throw ValidationException::withMessages([
+                    'results' => 'Please enter all subject marks for each expanded student.',
+                ]);
+            }
+
+            /** @var Student|null $student */
+            $student = $students->get($studentId);
+            if (! $student) {
+                continue;
+            }
+
+            $this->validateStudentBelongsToExam($student, $exam, $forcedSectionId);
+            $calculated = $this->calculateResult(['marks' => $marks->all()], $exam);
+
+            /** @var StudentResult $result */
+            $result = StudentResult::query()->firstOrNew([
+                'student_id' => $student->id,
+                'exam_id' => $exam->id,
+            ]);
+            $result->fill([
+                'class_id' => $exam->class_id,
+                'section_id' => $exam->section_id ?: $student->section_id,
+                'recorded_by' => $request->user()?->id,
+                'student_name' => $student->name,
+                'roll_no' => $student->roll_no,
+                'registration_no' => $student->registration_no,
+                'father_name' => $student->father_name,
+                'mother_name' => $student->mother_name,
+                'group_name' => $student->group_name ?? null,
+                'class_level' => $exam->schoolClass?->class_name,
+                'section_name' => $exam->section?->section_name ?: $student->section?->section_name,
+                'exam_name' => $exam->exam_name,
+                'exam_year' => $exam->exam_year,
+                'total_marks' => $calculated['total_marks'],
+                'gpa' => $calculated['gpa'],
+                'grade' => $calculated['grade'],
+                'result_status' => $calculated['result_status'],
+                'raw_marks' => $calculated['raw_marks'],
+                'meta' => $calculated['meta'],
+            ]);
+            $result->save();
+
+            $result->items()->delete();
+            $result->items()->createMany($calculated['items']);
+            $processed++;
+        }
+
+        if ($processed === 0) {
+            throw ValidationException::withMessages([
+                'results' => 'No student marks were submitted. Expand at least one student and fill all subject marks.',
+            ]);
+        }
+
+        return redirect()->route('admin.student-results.index')
+            ->with('success', "Student results saved for {$processed} student(s).");
     }
 
     public function edit(StudentResult $studentResult): View
@@ -295,6 +411,13 @@ class StudentResultController extends Controller
             ->with('section.schoolClass')
             ->findOrFail((int) $payload['student_id']);
 
+        $this->validateStudentBelongsToExam($student, $exam);
+
+        return [$exam, $student];
+    }
+
+    private function validateStudentBelongsToExam(Student $student, Exam $exam, ?int $forcedSectionId = null): void
+    {
         if ((int) $student->section?->class_id !== (int) $exam->class_id) {
             throw ValidationException::withMessages([
                 'student_id' => 'Selected student does not belong to the exam class.',
@@ -307,7 +430,11 @@ class StudentResultController extends Controller
             ]);
         }
 
-        return [$exam, $student];
+        if ($forcedSectionId !== null && (int) $student->section_id !== $forcedSectionId) {
+            throw ValidationException::withMessages([
+                'student_id' => 'Selected student does not belong to the selected section.',
+            ]);
+        }
     }
 
     /**

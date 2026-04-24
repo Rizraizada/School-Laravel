@@ -70,13 +70,13 @@
     </div>
 
     <div class="form-group">
-        <label for="subjective_mark">Subjective Mark</label>
-        <input id="subjective_mark" type="number" min="0" name="subjective_mark" value="{{ old('subjective_mark', $subjectConfig->subjective_mark ?? '') }}">
+        <label for="subjective_mark">CQ Mark</label>
+        <input id="subjective_mark" type="number" min="0" name="subjective_mark" value="{{ old('subjective_mark', $subjectConfig->subjective_mark ?? '') }}" placeholder="Written/CQ part">
     </div>
 
     <div class="form-group">
         <label for="mcq_mark">MCQ Mark</label>
-        <input id="mcq_mark" type="number" min="0" name="mcq_mark" value="{{ old('mcq_mark', $subjectConfig->mcq_mark ?? '') }}">
+        <input id="mcq_mark" type="number" min="0" name="mcq_mark" value="{{ old('mcq_mark', $subjectConfig->mcq_mark ?? '') }}" placeholder="Objective/MCQ part">
     </div>
 
     <div class="form-group">
@@ -89,6 +89,10 @@
         <input id="sort_order" type="number" min="0" name="sort_order" value="{{ old('sort_order', $subjectConfig->sort_order ?? 0) }}" required>
     </div>
 </div>
+
+<p style="margin:10px 0 0;color:#6b7280;">
+    Note: CQ + MCQ + Practical cannot exceed Full Mark. If left empty, Full Mark will be treated as CQ.
+</p>
 
 <div class="form-grid" style="margin-top: 12px;">
     <div class="form-group">

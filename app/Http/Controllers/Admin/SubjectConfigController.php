@@ -8,6 +8,7 @@ use App\Models\Subject;
 use App\Models\SubjectConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SubjectConfigController extends Controller
@@ -112,7 +113,7 @@ class SubjectConfigController extends Controller
      */
     private function validatePayload(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'class_id' => ['nullable', 'exists:classes,id'],
             'class_level' => ['required', 'string', 'max:120'],
             'group_name' => ['nullable', 'string', 'max:120'],
@@ -137,5 +138,28 @@ class SubjectConfigController extends Controller
             'is_active' => $request->boolean('is_active', true),
             'sort_order' => (int) $request->input('sort_order', 0),
         ];
+
+        $cqMark = (int) ($validated['subjective_mark'] ?? 0);
+        $mcqMark = (int) ($validated['mcq_mark'] ?? 0);
+        $practicalMark = (int) ($validated['practical_mark'] ?? 0);
+        $totalPartMarks = $cqMark + $mcqMark + $practicalMark;
+
+        // Keep backward compatibility: if no breakdown is given, assume full mark as CQ.
+        if ($totalPartMarks === 0) {
+            $cqMark = (int) $validated['full_mark'];
+            $totalPartMarks = $cqMark;
+        }
+
+        if ($totalPartMarks > (int) $validated['full_mark']) {
+            throw ValidationException::withMessages([
+                'full_mark' => 'CQ + MCQ + Practical marks cannot exceed full mark.',
+            ]);
+        }
+
+        $validated['subjective_mark'] = $cqMark;
+        $validated['mcq_mark'] = $mcqMark;
+        $validated['practical_mark'] = $practicalMark;
+
+        return $validated;
     }
 }

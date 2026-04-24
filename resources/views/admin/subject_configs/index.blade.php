@@ -50,6 +50,7 @@
                     <th>Subject</th>
                     <th>Type</th>
                     <th>Marks (Full/Pass)</th>
+                    <th>Breakdown (CQ/MCQ/Practical)</th>
                     <th>Rules</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -64,6 +65,7 @@
                         <td>{{ $config->subject_name }}</td>
                         <td>{{ ucfirst($config->subject_type) }}</td>
                         <td>{{ $config->full_mark }} / {{ $config->pass_mark }}</td>
+                        <td>{{ (int) ($config->subjective_mark ?? 0) }} / {{ (int) ($config->mcq_mark ?? 0) }} / {{ (int) ($config->practical_mark ?? 0) }}</td>
                         <td>
                             {{ $config->is_optional ? 'Optional' : 'Regular' }}<br>
                             GPA: {{ $config->include_in_gpa ? 'Yes' : 'No' }}<br>
@@ -82,7 +84,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="9">No subject configurations found.</td></tr>
+                    <tr><td colspan="10">No subject configurations found.</td></tr>
                 @endforelse
                 </tbody>
             </table>
