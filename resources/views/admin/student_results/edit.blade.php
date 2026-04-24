@@ -15,6 +15,7 @@
         <form method="POST" action="{{ route('admin.student-results.update', $record) }}">
             @csrf
             @method('PUT')
+            @php($isEdit = true)
             @include('admin.student_results._form')
         </form>
     </div>
